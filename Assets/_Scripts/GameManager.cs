@@ -46,10 +46,9 @@ public class GameManager : MonoBehaviour
     public void KillColliderCollision(Collider2D collider, GameObject other)
     {
         PlayerController player = other.GetComponent<PlayerController>();
-        if (player != null && player.wall != collider)
+        if (player != null && player.Wall != collider)
         {
-            Debug.Log("Somebody dead!");
-            //if (!player.jumping)
+            if (!player.Jumping)
             {
                 OnPlayerDeath(player);
             }

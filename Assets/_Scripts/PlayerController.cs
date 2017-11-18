@@ -1,112 +1,109 @@
-﻿
-using System.Collections;
-using System.Collections.Generic;
+﻿using Rewired;
 using UnityEngine;
+using DG.Tweening;
 
 public class PlayerController : MonoBehaviour
 {
-
-    public int jumpTime = 1;
-    public float jumpStart;
+    [Header("Player Settings")]
     public int playerNumber;
-    public float speed = 0;
-
-    public bool isJumping;
-
-    private bool Up;
-    private bool Down;
-    private bool Left;
-    private bool Right;
-
-    private int wallMade = 0;
-
-    //public KeyCode upKey;
-    //public KeyCode downKey;
-    //public KeyCode rightKey;
-    //public KeyCode leftKey;
-    public KeyCode jump;
-
-
+    public Vector2 startDirection;
+    public float speed;
+    public float jumpTime;
     public GameObject wallPrefab;
 
-    public Collider2D wall;
-    Vector2 lastWallEnd;
+    public bool Jumping { get; private set; }
 
-    private Rigidbody2D rigidbody;
-    
+    public Collider2D Wall { get; private set; }
+
+    private Vector2 lastWallEnd;
+    private Player player;
+    private Rigidbody2D rigid;
+    private float jumpStart;
+
     private void Awake()
     {
-        rigidbody = GetComponent<Rigidbody2D>();
+        rigid = GetComponent<Rigidbody2D>();
         jumpStart = 0;
-        isJumping = false;
+        Jumping = false;
     }
-    // Use this for initialization
-    void Start()
+    
+    private void Start()
     {
-        rigidbody.velocity = Vector2.up * speed;
+        player = ReInput.players.GetPlayer(playerNumber - 1);
+        rigid.velocity = startDirection * speed;
         SpawnWall();
     }
-
-    // Update is called once per frame
-    void Update()
+    
+    private void Update()
     {
-        if (isJumping)
+        if (Jumping)
         {
             jumpStart += Time.deltaTime;
             if (jumpStart > jumpTime)
             {
                 jumpStart = 0;
-                isJumping = false;
+                Jumping = false;
+                SpawnWall();
             }
         }
+        else
+        {
+            Vector2 velocity = GetComponent<Rigidbody2D>().velocity;
+            float vert = player.GetAxis("MoveVertical");
+            float horz = player.GetAxis("MoveHorizontal");
 
-        Vector2 velocity = GetComponent<Rigidbody2D>().velocity;
+            if (Mathf.Abs(vert) > Mathf.Abs(horz))
+            {
+                if (vert < 0)
+                {
+                    rigid.velocity = Vector2.down * speed;
+                }
+                else 
+                {
+                    rigid.velocity = Vector2.up * speed;
+                }
+            }
+            else if (Mathf.Abs(vert) < Mathf.Abs(horz))
+            {
+                if (horz < 0)
+                {
+                    rigid.velocity = Vector2.left * speed;
+                }
+                else
+                {
+                    rigid.velocity = Vector2.right * speed;
+                }
+            }
 
-        if (Input.GetAxis("Vertical") < 0)
-        {
-            rigidbody.velocity = -Vector2.up * speed;
-        }
-        else if (Input.GetAxis("Vertical") > 0)
-        {
-            rigidbody.velocity = Vector2.up * speed;
-        }
-        else if (Input.GetAxis("Horizontal") > 0)
-        {
-            rigidbody.velocity = Vector2.right * speed;
-        }
-        else if (Input.GetAxis("Horizontal") < 0)
-        {
-            rigidbody.velocity = -Vector2.right * speed;
+            if (velocity != rigid.velocity)
+            {
+                SpawnWall();
+            }
+            FitColliderBetween(Wall, lastWallEnd, transform.position);
         }
 
-        if (velocity != rigidbody.velocity)
+        if (player.GetButtonDown("Jump") && Jumping == false)
         {
             SpawnWall();
-        }
-
-        if (!isJumping)
-        {
-            FitColliderBetween(wall, lastWallEnd, transform.position);
-        }
-
-        if (Input.GetKeyDown(jump) && isJumping == false)
-        {
-            isJumping = true;
+            Jumping = true;
+            transform.DOScale(1.5f, jumpTime / 2).OnComplete(() => ScaleDown());
         }
     }
 
+    private void ScaleDown()
+    {
+        transform.DOScale(1f, jumpTime / 2);
+    }
 
-
-    void SpawnWall()
+    private void SpawnWall()
     {
         lastWallEnd = transform.position;
         
         GameObject g = (GameObject)Instantiate(wallPrefab, transform.position, Quaternion.identity);
-        wall = g.GetComponent<Collider2D>();
+        Wall = g.GetComponent<Collider2D>();
     }
-
-
-    void FitColliderBetween(Collider2D co, Vector2 a, Vector2 b)
+    
+    private void FitColliderBetween(Collider2D co, Vector2 a, Vector2 b)
     {
         // Calculate the Center Position
         co.transform.position = a + (b - a) * 0.5f;
@@ -118,7 +115,5 @@ public class PlayerController : MonoBehaviour
         else
             co.transform.localScale = new Vector2(1, dist + 1);
     }
-
-
-
+    
 }
