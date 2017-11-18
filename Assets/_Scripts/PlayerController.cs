@@ -78,15 +78,27 @@ public class PlayerController : MonoBehaviour {
         }
         if (velocity != GetComponent<Rigidbody2D>().velocity)
         {
-            SpawnWall();
+            
 
             
         }
         FitColliderBetween(wall, lastWallEnd, transform.position);
 
-        if (Input.GetKeyDown(jump))
+        if (Input.GetKeyDown(jump) && isJumping == false)
         {
+            isJumping = true;
 
+            if (jumpStart > jumpTime)
+            {
+                jumpStart = 0;
+                isJumping = false;
+            
+            }
+        }
+
+        if(isJumping == false)
+        {
+            SpawnWall();
         }
     }
 
