@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
+    public int playerNumber ;
     public float speed = 0 ;
     private bool Up;
     private bool Down;
