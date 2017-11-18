@@ -73,7 +73,7 @@ public class PlayerController : MonoBehaviour {
 
             
         }
-        fitColliderBetween(wall, lastWallEnd, transform.position);
+        FitColliderBetween(wall, lastWallEnd, transform.position);
     }
 
 
@@ -89,7 +89,7 @@ public class PlayerController : MonoBehaviour {
     }
 
 
-    void fitColliderBetween(Collider2D co, Vector2 a, Vector2 b)
+    void FitColliderBetween (Collider2D co, Vector2 a, Vector2 b)
     {
         // Calculate the Center Position
         co.transform.position = a + (b - a) * 0.5f;
