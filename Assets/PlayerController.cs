@@ -96,9 +96,9 @@ public class PlayerController : MonoBehaviour {
         // Scale it (horizontally or vertically)
         float dist = Vector2.Distance(a, b);
         if (a.x != b.x)
-            co.transform.localScale = new Vector2(dist, 1);
+            co.transform.localScale = new Vector2(dist +1, 1);
         else
-            co.transform.localScale = new Vector2(1, dist);
+            co.transform.localScale = new Vector2(1, dist +1);
     }
 
 }
