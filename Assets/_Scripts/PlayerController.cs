@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -22,7 +23,7 @@ public class PlayerController : MonoBehaviour {
 
     public GameObject wallPrefab;
 
-    Collider2D wall;
+    public Collider2D wall;
     Vector2 lastWallEnd;
 
 

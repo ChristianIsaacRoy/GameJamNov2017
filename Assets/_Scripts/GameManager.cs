@@ -43,12 +43,16 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void KillColliderCollision(GameObject other)
+    public void KillColliderCollision(Collider2D collider, GameObject other)
     {
         PlayerController player = other.GetComponent<PlayerController>();
-        if (player != null)
+        if (player != null && player.wall != collider)
         {
-            OnPlayerDeath(player);
+            Debug.Log("Somebody dead!");
+            //if (!player.jumping)
+            {
+                OnPlayerDeath(player);
+            }
         }
     }
 
@@ -66,8 +70,14 @@ public class GameManager : MonoBehaviour
             playerOneScore++;
         }
 
-        player1.gameObject.SetActive(false);
-        player2.gameObject.SetActive(false);
+        if (player1 != null)
+        {
+            player1.gameObject.SetActive(false);
+        }
+        if (player2 != null)
+        {
+            player2.gameObject.SetActive(false);
+        }
     }
 
     private void RandomTileFall()
