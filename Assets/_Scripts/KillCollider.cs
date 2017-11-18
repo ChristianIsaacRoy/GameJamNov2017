@@ -6,6 +6,9 @@ public class KillCollider : MonoBehaviour
 {
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        GameManager.instance.KillColliderCollision(collision.gameObject);
+        if (GameManager.instance != null)
+        {
+            GameManager.instance.KillColliderCollision(collision.gameObject);
+        }
     }
 }

@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour {
+public class PlayerController : MonoBehaviour
+{
 
     public int jumpTime = 1;
     public float jumpStart;
-    public int playerNumber ;
-    public float speed = 0 ;
+    public int playerNumber;
+    public float speed = 0;
 
-    public bool isJumping = false;
+    public bool isJumping;
 
     private bool Up;
     private bool Down;
@@ -30,75 +31,66 @@ public class PlayerController : MonoBehaviour {
     Collider2D wall;
     Vector2 lastWallEnd;
 
-
+    private Rigidbody2D rigidbody;
+    
     private void Awake()
     {
+        rigidbody = GetComponent<Rigidbody2D>();
         jumpStart = 0;
+        isJumping = false;
     }
     // Use this for initialization
-    void Start () {
-        GetComponent<Rigidbody2D>().velocity = Vector2.up * speed;
+    void Start()
+    {
+        rigidbody.velocity = Vector2.up * speed;
         SpawnWall();
-
     }
 
     // Update is called once per frame
-    void Update() {
-        if(isJumping = true)
+    void Update()
+    {
+        if (isJumping)
         {
             jumpStart += Time.deltaTime;
-        }
-
-         Vector2 velocity = GetComponent<Rigidbody2D>().velocity;
-
-      if (Input.GetAxis("Vertical" )< 0)
-        {
-            
-            GetComponent<Rigidbody2D>().velocity = -Vector2.up * speed;
-
-
-        }
-      else if (Input.GetAxis("Vertical" )> 0)
-        {
-            GetComponent<Rigidbody2D>().velocity = Vector2.up * speed;
-  
-
-        }
-      else if(Input.GetAxis("Horizontal") > 0)
-        {
-            GetComponent<Rigidbody2D>().velocity = Vector2.right * speed;
-   
-
-        }
-      else if(Input.GetAxis("Horizontal") < 0)
-        {
-            GetComponent<Rigidbody2D>().velocity = -Vector2.right * speed;
-          
-            
-        }
-        if (velocity != GetComponent<Rigidbody2D>().velocity)
-        {
-            
-
-            
-        }
-        FitColliderBetween(wall, lastWallEnd, transform.position);
-
-        if (Input.GetKeyDown(jump) && isJumping == false)
-        {
-            isJumping = true;
-
             if (jumpStart > jumpTime)
             {
                 jumpStart = 0;
                 isJumping = false;
-            
             }
         }
 
-        if(isJumping == false)
+        Vector2 velocity = GetComponent<Rigidbody2D>().velocity;
+
+        if (Input.GetAxis("Vertical") < 0)
+        {
+            rigidbody.velocity = -Vector2.up * speed;
+        }
+        else if (Input.GetAxis("Vertical") > 0)
+        {
+            rigidbody.velocity = Vector2.up * speed;
+        }
+        else if (Input.GetAxis("Horizontal") > 0)
+        {
+            rigidbody.velocity = Vector2.right * speed;
+        }
+        else if (Input.GetAxis("Horizontal") < 0)
+        {
+            rigidbody.velocity = -Vector2.right * speed;
+        }
+
+        if (velocity != rigidbody.velocity)
         {
             SpawnWall();
+        }
+
+        if (!isJumping)
+        {
+            FitColliderBetween(wall, lastWallEnd, transform.position);
+        }
+
+        if (Input.GetKeyDown(jump) && isJumping == false)
+        {
+            isJumping = true;
         }
     }
 
@@ -106,16 +98,14 @@ public class PlayerController : MonoBehaviour {
 
     void SpawnWall()
     {
-
         lastWallEnd = transform.position;
-
-
+        
         GameObject g = (GameObject)Instantiate(wallPrefab, transform.position, Quaternion.identity);
         wall = g.GetComponent<Collider2D>();
     }
 
 
-    void FitColliderBetween (Collider2D co, Vector2 a, Vector2 b)
+    void FitColliderBetween(Collider2D co, Vector2 a, Vector2 b)
     {
         // Calculate the Center Position
         co.transform.position = a + (b - a) * 0.5f;
@@ -123,9 +113,9 @@ public class PlayerController : MonoBehaviour {
         // Scale it (horizontally or vertically)
         float dist = Vector2.Distance(a, b);
         if (a.x != b.x)
-            co.transform.localScale = new Vector2(dist +1, 1);
+            co.transform.localScale = new Vector2(dist + 1, 1);
         else
-            co.transform.localScale = new Vector2(1, dist +1);
+            co.transform.localScale = new Vector2(1, dist + 1);
     }
 
 
