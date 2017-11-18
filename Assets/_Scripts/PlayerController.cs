@@ -5,8 +5,13 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
+    public int jumpTime = 1;
+    public float jumpStart;
     public int playerNumber ;
     public float speed = 0 ;
+
+    public bool isJumping = false;
+
     private bool Up;
     private bool Down;
     private bool Left;
@@ -14,11 +19,11 @@ public class PlayerController : MonoBehaviour {
 
     private int wallMade = 0;
 
-    public KeyCode upKey;
-    public KeyCode downKey;
-    public KeyCode rightKey;
-    public KeyCode leftKey;
-
+    //public KeyCode upKey;
+    //public KeyCode downKey;
+    //public KeyCode rightKey;
+    //public KeyCode leftKey;
+    public KeyCode jump;
 
 
     public GameObject wallPrefab;
@@ -29,7 +34,7 @@ public class PlayerController : MonoBehaviour {
 
     private void Awake()
     {
-   
+        jumpStart = 0;
     }
     // Use this for initialization
     void Start () {
@@ -40,6 +45,10 @@ public class PlayerController : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+        if(isJumping = true)
+        {
+            jumpStart += Time.deltaTime;
+        }
 
          Vector2 velocity = GetComponent<Rigidbody2D>().velocity;
 
@@ -70,11 +79,28 @@ public class PlayerController : MonoBehaviour {
         }
         if (velocity != GetComponent<Rigidbody2D>().velocity)
         {
-            SpawnWall();
+            
 
             
         }
-        fitColliderBetween(wall, lastWallEnd, transform.position);
+        FitColliderBetween(wall, lastWallEnd, transform.position);
+
+        if (Input.GetKeyDown(jump) && isJumping == false)
+        {
+            isJumping = true;
+
+            if (jumpStart > jumpTime)
+            {
+                jumpStart = 0;
+                isJumping = false;
+            
+            }
+        }
+
+        if(isJumping == false)
+        {
+            SpawnWall();
+        }
     }
 
 
@@ -90,7 +116,7 @@ public class PlayerController : MonoBehaviour {
     }
 
 
-    void fitColliderBetween(Collider2D co, Vector2 a, Vector2 b)
+    void FitColliderBetween (Collider2D co, Vector2 a, Vector2 b)
     {
         // Calculate the Center Position
         co.transform.position = a + (b - a) * 0.5f;
@@ -102,5 +128,7 @@ public class PlayerController : MonoBehaviour {
         else
             co.transform.localScale = new Vector2(1, dist +1);
     }
+
+
 
 }
