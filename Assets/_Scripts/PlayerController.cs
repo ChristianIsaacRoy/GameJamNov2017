@@ -75,10 +75,16 @@ public class PlayerController : MonoBehaviour
                 }
             }
 
-            if (velocity != rigid.velocity)
+            if (velocity != rigid.velocity && velocity*-1 != rigid.velocity)
             {
                 SpawnWall();
             }
+
+            if (velocity*-1 == rigid.velocity)
+            {
+                rigid.velocity = velocity;
+            }
+
             FitColliderBetween(Wall, lastWallEnd, transform.position);
         }
 
@@ -86,21 +92,21 @@ public class PlayerController : MonoBehaviour
         {
             SpawnWall();
             Jumping = true;
-            transform.DOScale(1.5f, jumpTime / 2).OnComplete(() => ScaleDown());
+            transform.DOScale(.4f, jumpTime / 2).OnComplete(() => ScaleDown());
         }
     }
 
     private void ScaleDown()
     {
-        transform.DOScale(1f, jumpTime / 2);
+        transform.DOScale(.2f, jumpTime / 2);
     }
 
     private void SpawnWall()
     {
         lastWallEnd = transform.position;
         
-        GameObject g = (GameObject)Instantiate(wallPrefab, transform.position, Quaternion.identity);
-        Wall = g.GetComponent<Collider2D>();
+        GameObject go = Instantiate(wallPrefab, transform.position, Quaternion.identity);
+        Wall = go.GetComponent<Collider2D>();
     }
     
     private void FitColliderBetween(Collider2D co, Vector2 a, Vector2 b)
@@ -111,9 +117,9 @@ public class PlayerController : MonoBehaviour
         // Scale it (horizontally or vertically)
         float dist = Vector2.Distance(a, b);
         if (a.x != b.x)
-            co.transform.localScale = new Vector2(dist + 1, 1);
+            co.transform.localScale = new Vector2(dist + .1f, .1f);
         else
-            co.transform.localScale = new Vector2(1, dist + 1);
+            co.transform.localScale = new Vector2(.1f, dist + .1f);
     }
     
 }

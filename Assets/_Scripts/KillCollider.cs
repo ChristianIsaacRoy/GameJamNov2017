@@ -8,5 +8,9 @@ public class KillCollider : MonoBehaviour
         {
             GameManager.instance.KillColliderCollision(GetComponent<Collider2D>(), collision.gameObject);
         }
+        else
+        {
+            Debug.Log("No GM");
+        }
     }
 }

@@ -54,6 +54,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timeTillDeath: 2
   fallSpeed: 0.5
+  killCollider: {fileID: 1732861863684524, guid: 20b64736d2476d54198fc17716c5936b,
+    type: 2}
 --- !u!212 &212352050049463106
 SpriteRenderer:
   m_ObjectHideFlags: 1

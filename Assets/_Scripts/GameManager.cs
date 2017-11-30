@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 
 public class GameManager : MonoBehaviour
@@ -6,41 +8,55 @@ public class GameManager : MonoBehaviour
     public float fallingStartTime;
     public float minTimeBetweenFalls;
     public float maxTimeBetweenFalls;
-
-    public Tilemap tilemapFloor;
-    public GameObject fallingTile;
-    public GameObject killCollider;
-
-    public PlayerController player1;
-    public PlayerController player2;
+    
+    public GameObject fallingTilePrefab;
+    public GameObject gameOverScreen;
 
     public static GameManager instance;
+
+    private Tilemap tilemapFloor;
 
     private float timeToNextFall;
     private int width = 18;
     private int height = 10;
-    private int numOfTiles = 180;
+    private int numOfTiles;
 
-    private int playerOneScore;
-    private int playerTwoScore;
+    public int PlayerOneScore { get; private set; }
+    public int PlayerTwoScore { get; private set; }
 
     private void Awake()
     {
+        if (instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        tilemapFloor = GameObject.FindGameObjectWithTag("tilemap").GetComponent<Tilemap>();
         instance = this;
         timeToNextFall = fallingStartTime;
-        playerOneScore = 0;
-        playerTwoScore = 0;
+        PlayerOneScore = 0;
+        PlayerTwoScore = 0;
+        numOfTiles = width * height;
+        DontDestroyOnLoad(gameObject);
     }
-
+    
     private void Update()
     {
         timeToNextFall -= Time.deltaTime;
 
         if (timeToNextFall <= 0)
         {
-            RandomTileFall();
+            StartCoroutine(RandomTileFall());
             timeToNextFall = Random.Range(minTimeBetweenFalls, maxTimeBetweenFalls);
         }
+    }
+
+    private void OnLevelWasLoaded(int level)
+    {
+        timeToNextFall = fallingStartTime;
+        tilemapFloor = GameObject.FindGameObjectWithTag("tilemap").GetComponent<Tilemap>();
+        numOfTiles = width * height;
     }
 
     public void KillColliderCollision(Collider2D collider, GameObject other)
@@ -62,28 +78,27 @@ public class GameManager : MonoBehaviour
 
         if (playerNumber == 1)
         {
-            playerTwoScore++;
+            PlayerTwoScore++;
         }
         else if (playerNumber == 2)
         {
-            playerOneScore++;
+            PlayerOneScore++;
         }
 
-        if (player1 != null)
+        foreach (GameObject go in GameObject.FindGameObjectsWithTag("Player"))
         {
-            player1.gameObject.SetActive(false);
+            go.SetActive(false);
         }
-        if (player2 != null)
-        {
-            player2.gameObject.SetActive(false);
-        }
+        
+        //SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        gameOverScreen.SetActive(true);
     }
 
-    private void RandomTileFall()
+    private IEnumerator RandomTileFall()
     {
         if (numOfTiles <= 0)
         {
-            return;
+            yield return 0;
         }
 
         Vector3Int tilePos;
@@ -96,8 +111,7 @@ public class GameManager : MonoBehaviour
         tilemapFloor.SetTile(tilePos, null);
         numOfTiles--;
 
-        GameObject go = Instantiate(fallingTile, new Vector3(tilePos.x+.5f, tilePos.y+.5f), Quaternion.identity);
-        Instantiate(killCollider, new Vector3(tilePos.x + .5f, tilePos.y + .5f), Quaternion.identity);
+        GameObject go = Instantiate(fallingTilePrefab, new Vector3(tilePos.x+.5f, tilePos.y+.5f), Quaternion.identity);
         go.GetComponent<SpriteRenderer>().sortingOrder = -1;
     }
 }
